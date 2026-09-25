@@ -41,5 +41,5 @@ This is a demonstration. The form asks visitors to use test details, emails are 
 ## Author
 
 Designed and built by **Shabbir Hussain** — conversion-focused websites, lead capture, and practical AI automation.
-- LinkedIn: _add link_
+- LinkedIn: https://www.linkedin.com/in/shabbir-h-9b13a7370
 - Email: shabbirtech110@gmail.com
