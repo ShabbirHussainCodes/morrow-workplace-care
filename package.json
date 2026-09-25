@@ -5,7 +5,7 @@
   "description": "Concept website for a fictional workplace care company with a working lead-capture and follow-up workflow. Portfolio project by Shabbir Hussain.",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   },
   "scripts": {
     "test": "node --test"
