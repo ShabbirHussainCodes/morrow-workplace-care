@@ -32,13 +32,167 @@
         <a href="#services">Services</a>
         <a href="#how-it-works">How it works</a>
         <a href="#workflow">Behind the form</a>
-        <a class="btn btn--primary" href="#enquire">Request a walkthrough</a>
+        <a class="btn btn--primary" href="#enquire" aria-label="Request a walkthrough"><span class="cta-long">Request a walkthrough</span><span class="cta-short">Enquire</span></a>
       </nav>
     </div>
   </header>
 
   <main id="main">
-    <!-- Sections are added in Step 3 and Step 4 -->
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero__grid">
+        <div>
+          <span class="eyebrow">Commercial cleaning &amp; workplace care</span>
+          <h1>A workplace your team notices for the right reasons.</h1>
+          <p class="hero__lede">
+            Morrow looks after offices, shared workspaces and commercial spaces on a schedule
+            that fits how you work, so you stop chasing a supplier and start trusting the space.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#enquire">Request a walkthrough</a>
+            <a class="btn btn--ghost" href="#how-it-works">See how it works</a>
+          </div>
+          <p class="hero__note">No commitment. Every plan starts with a walkthrough of your space.</p>
+        </div>
+        <div class="media" data-label="Image: calm, tidy open-plan office">
+          <img src="/assets/images/hero-workspace.jpg" alt="A calm, tidy open-plan office with natural light" width="960" height="1200" fetchpriority="high">
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section section--alt" id="services" aria-labelledby="services-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Services</span>
+          <h2 id="services-title">Care that matches how your space is used.</h2>
+          <p>Three ways to work with us. Most teams start with one and adjust once we know the space.</p>
+        </div>
+
+        <div class="cards">
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+            </div>
+            <h3>Routine office care</h3>
+            <p class="card__best">For offices that need a dependable daily or weekly rhythm.</p>
+            <ul>
+              <li>Desks and shared surfaces</li>
+              <li>Kitchens and breakout areas</li>
+              <li>Washrooms cleaned and restocked</li>
+              <li>Bins, recycling and floors</li>
+            </ul>
+            <a class="card__link" href="#enquire" data-service="routine">Ask about routine care →</a>
+          </article>
+
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M14 15.5c.6-.3 1.3-.5 2-.5 3 0 6 2 6 5"/></svg>
+            </div>
+            <h3>Shared-space detailing</h3>
+            <p class="card__best">For coworking floors, meeting rooms and receptions that see heavy use.</p>
+            <ul>
+              <li>High-touch points through the day</li>
+              <li>Meeting rooms reset between bookings</li>
+              <li>Reception kept presentation-ready</li>
+              <li>Glass partitions and kitchen detailing</li>
+            </ul>
+            <a class="card__link" href="#enquire" data-service="shared">Ask about shared spaces →</a>
+          </article>
+
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+            </div>
+            <h3>One-off resets</h3>
+            <p class="card__best">For move-ins, move-outs, post-refurbishment or before an important visit.</p>
+            <ul>
+              <li>Top-to-bottom deep clean</li>
+              <li>Post-works dust removal</li>
+              <li>Carpet and upholstery refresh</li>
+              <li>Handover-ready final checklist</li>
+            </ul>
+            <a class="card__link" href="#enquire" data-service="reset">Ask about a reset →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section" id="how-it-works" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">How it works</span>
+          <h2 id="how-title">Three steps from enquiry to a clear plan.</h2>
+        </div>
+        <ol class="steps">
+          <li class="step">
+            <span class="step__num">01</span>
+            <h3>Share your needs</h3>
+            <p>Tell us about your space, how it is used and when you need support. A short form is all it takes.</p>
+          </li>
+          <li class="step">
+            <span class="step__num">02</span>
+            <h3>Walk through the space</h3>
+            <p>We visit, see how the space works day to day and note the areas that matter most to your team.</p>
+          </li>
+          <li class="step">
+            <span class="step__num">03</span>
+            <h3>Agree on a plan</h3>
+            <p>You get a written scope, a visit schedule and one named contact. Changes are agreed in writing, not guessed.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- How we work -->
+    <section class="section section--alt" aria-labelledby="principles-title">
+      <div class="container split">
+        <div class="media" data-label="Image: clean meeting room or kitchen">
+          <img src="/assets/images/detail-space.jpg" alt="A clean, well-kept meeting room ready for the next booking" width="1200" height="960" loading="lazy">
+        </div>
+        <div>
+          <span class="eyebrow">How we work</span>
+          <h2 id="principles-title">Fewer surprises. Clearer standards.</h2>
+          <p>The things that make workplace care easy to hand over and easy to trust.</p>
+          <div class="principles">
+            <div class="principle">
+              <h3>One named contact</h3>
+              <p>You always know who to message, and they know your space.</p>
+            </div>
+            <div class="principle">
+              <h3>A written scope</h3>
+              <p>What is included, how often, and what is not, agreed up front.</p>
+            </div>
+            <div class="principle">
+              <h3>A checklist after every visit</h3>
+              <p>A short record of what was done, so nothing relies on memory.</p>
+            </div>
+            <div class="principle">
+              <h3>Hours that suit you</h3>
+              <p>Early, late or between bookings, planned around your team.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA band -->
+    <section class="section">
+      <div class="container">
+        <div class="cta-band">
+          <div>
+            <h2>Ready to see what your space needs?</h2>
+            <p>Share a few details and we will suggest a walkthrough time that works for your team.</p>
+          </div>
+          <a class="btn btn--primary" href="#enquire">Request a walkthrough</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Enquiry form + workflow: added in Step 4 -->
+
   </main>
 
   <footer class="site-footer">
