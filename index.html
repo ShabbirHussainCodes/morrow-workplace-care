@@ -178,20 +178,140 @@
       </div>
     </section>
 
-    <!-- CTA band -->
-    <section class="section">
-      <div class="container">
-        <div class="cta-band">
-          <div>
-            <h2>Ready to see what your space needs?</h2>
-            <p>Share a few details and we will suggest a walkthrough time that works for your team.</p>
+    <!-- Enquiry form -->
+    <section class="section section--form" id="enquire" aria-labelledby="enquire-title">
+      <div class="container enquire">
+        <div class="enquire__intro">
+          <span class="eyebrow">Request a walkthrough</span>
+          <h2 id="enquire-title">Tell us about your space.</h2>
+          <p>Share a few details and we will come back with walkthrough times that suit your team.</p>
+          <div class="demo-note" role="note">
+            <strong>This is a portfolio demo.</strong>
+            Please use test details, for example “Test User” and “test@example.com”.
+            Test enquiries are shown with masked emails on a demo dashboard and deleted after 7 days.
           </div>
-          <a class="btn btn--primary" href="#enquire">Request a walkthrough</a>
+        </div>
+
+        <div class="form-card">
+          <form id="lead-form" novalidate>
+            <input type="hidden" name="service" id="service">
+            <!-- Spam trap: hidden from people, often filled in by bots -->
+            <div class="hp" aria-hidden="true">
+              <label for="website">Website</label>
+              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="fullName">Full name</label>
+                <input id="fullName" name="fullName" type="text" autocomplete="name" required>
+                <p class="field__error" id="fullName-error"></p>
+              </div>
+              <div class="field">
+                <label for="email">Work email</label>
+                <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required>
+                <p class="field__error" id="email-error"></p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" autocomplete="organization" required>
+              <p class="field__error" id="company-error"></p>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="spaceType">Type of space</label>
+                <select id="spaceType" name="spaceType" required>
+                  <option value="">Choose one</option>
+                  <option value="office">Office</option>
+                  <option value="coworking">Shared workspace / coworking</option>
+                  <option value="retail">Retail or showroom</option>
+                  <option value="clinic">Clinic or studio</option>
+                  <option value="other">Other commercial space</option>
+                </select>
+                <p class="field__error" id="spaceType-error"></p>
+              </div>
+              <div class="field">
+                <label for="timing">When is support needed?</label>
+                <select id="timing" name="timing" required>
+                  <option value="">Choose one</option>
+                  <option value="asap">As soon as possible</option>
+                  <option value="two-weeks">Within 2 weeks</option>
+                  <option value="month">Within a month</option>
+                  <option value="exploring">Just exploring options</option>
+                </select>
+                <p class="field__error" id="timing-error"></p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="4" placeholder="How is the space used, and what would you like to improve?" required></textarea>
+              <p class="field__error" id="message-error"></p>
+            </div>
+
+            <button class="btn btn--primary btn--block" type="submit" id="submit-btn">Request a walkthrough</button>
+            <p class="form-status" id="form-status" role="alert"></p>
+          </form>
+
+          <div class="result" id="lead-result" hidden tabindex="-1">
+            <p class="result__badge" id="result-badge">Enquiry received</p>
+            <h3>Thanks — here is what happened behind the scenes.</h3>
+            <ol class="result__steps">
+              <li><strong>Captured and validated.</strong> Your answers were checked and cleaned.</li>
+              <li id="result-saved"><strong>Saved.</strong> <span></span></li>
+              <li><strong>Tagged and prioritised.</strong>
+                <span class="tags" id="result-tags"></span>
+              </li>
+              <li><strong>Next step for the team:</strong> <span id="result-next"></span></li>
+              <li><strong>Follow-up drafted.</strong> Ready for the team to review and send:
+                <div class="draft">
+                  <p class="draft__subject" id="result-subject"></p>
+                  <pre class="draft__body" id="result-body"></pre>
+                </div>
+              </li>
+            </ol>
+            <button class="btn btn--ghost" type="button" id="reset-btn">Send another test enquiry</button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Enquiry form + workflow: added in Step 4 -->
+    <!-- Behind the form -->
+    <section class="section section--alt" id="workflow" aria-labelledby="workflow-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Behind the form</span>
+          <h2 id="workflow-title">An enquiry should never sit unread in an inbox.</h2>
+          <p>This is the part most business websites skip. Every enquiry is turned into a clear next step for the team, automatically.</p>
+        </div>
+        <ol class="flow">
+          <li class="flow__step">
+            <span class="flow__num">1</span>
+            <h3>Captured</h3>
+            <p>The form checks every answer before sending, and quietly filters out spam bots.</p>
+          </li>
+          <li class="flow__step">
+            <span class="flow__num">2</span>
+            <h3>Saved</h3>
+            <p>The enquiry is stored in a Postgres database through a secure server function, not in someone's inbox.</p>
+          </li>
+          <li class="flow__step">
+            <span class="flow__num">3</span>
+            <h3>Tagged</h3>
+            <p>Simple, explainable rules tag the type of space, the likely service and a priority based on timing.</p>
+          </li>
+          <li class="flow__step">
+            <span class="flow__num">4</span>
+            <h3>Handed over</h3>
+            <p>A follow-up email is drafted and the lead appears on a team dashboard with its next step.</p>
+          </li>
+        </ol>
+        <p class="flow__note">Built for this concept with HTML, CSS, JavaScript, a Vercel serverless function and Neon Postgres. The same pattern can send alerts to email, Slack or a CRM.</p>
+      </div>
+    </section>
 
   </main>
 
@@ -216,5 +336,6 @@
   </footer>
 
   <script src="/assets/js/main.js" defer></script>
+  <script type="module" src="/assets/js/form.js"></script>
 </body>
 </html>
