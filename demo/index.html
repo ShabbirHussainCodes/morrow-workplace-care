@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lead dashboard (demo) — Morrow Workplace Care concept</title>
+  <meta name="description" content="Demo lead dashboard for the Morrow Workplace Care concept website, built by Shabbir Hussain.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#12302E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body class="dash-body">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="concept-strip" role="note">
+    Demo dashboard for a portfolio concept by Shabbir Hussain — test data only, emails masked, deleted after 7 days.
+  </div>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="wordmark" href="/">Morrow <span>Workplace Care</span></a>
+      <nav class="site-nav" aria-label="Dashboard">
+        <a href="/#workflow">How it works</a>
+        <a class="btn btn--primary" href="/#enquire"><span class="cta-long">Send a test enquiry</span><span class="cta-short">Test it</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="section dash">
+    <div class="container">
+      <div class="dash__head">
+        <div>
+          <span class="eyebrow">Team view · demo</span>
+          <h1 class="dash__title">Lead pipeline</h1>
+          <p class="dash__lede">Every enquiry from the website lands here with tags, a priority and a drafted follow-up, so nothing sits unread in an inbox.</p>
+        </div>
+        <button class="btn btn--ghost" type="button" id="refresh-btn">Refresh</button>
+      </div>
+
+      <p class="dash__notice" id="dash-notice" hidden></p>
+
+      <div class="stats" id="stats" aria-live="polite">
+        <div class="stat"><span class="stat__label">New</span><span class="stat__value" data-stat="New">–</span></div>
+        <div class="stat"><span class="stat__label">Walkthrough booked</span><span class="stat__value" data-stat="Walkthrough booked">–</span></div>
+        <div class="stat"><span class="stat__label">Proposal sent</span><span class="stat__value" data-stat="Proposal sent">–</span></div>
+        <div class="stat"><span class="stat__label">High priority</span><span class="stat__value" data-stat="High">–</span></div>
+      </div>
+
+      <div class="filters" role="tablist" aria-label="Filter by stage">
+        <button class="filter is-active" role="tab" aria-selected="true" data-filter="all">All</button>
+        <button class="filter" role="tab" aria-selected="false" data-filter="New">New</button>
+        <button class="filter" role="tab" aria-selected="false" data-filter="Walkthrough booked">Walkthrough booked</button>
+        <button class="filter" role="tab" aria-selected="false" data-filter="Proposal sent">Proposal sent</button>
+      </div>
+
+      <div id="lead-list" class="lead-list" aria-live="polite">
+        <p class="dash__loading">Loading leads…</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="disclosure" style="margin-top:0;border-top:0;padding-top:0">
+        Concept project designed and built by Shabbir Hussain. This is a portfolio demonstration, not a real cleaning company.
+        Contact: <a href="mailto:shabbirtech110@gmail.com">shabbirtech110@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+
+  <template id="lead-template">
+    <article class="lead">
+      <div class="lead__top">
+        <div>
+          <h2 class="lead__company"></h2>
+          <p class="lead__meta"></p>
+        </div>
+        <span class="priority"></span>
+      </div>
+      <div class="tags lead__tags"></div>
+      <p class="lead__message"></p>
+      <p class="lead__next"><strong>Next step:</strong> <span></span></p>
+      <details class="lead__draft">
+        <summary>View drafted follow-up</summary>
+        <div class="draft">
+          <p class="draft__subject"></p>
+          <pre class="draft__body"></pre>
+        </div>
+      </details>
+      <div class="lead__status">
+        <label>Stage
+          <select>
+            <option>New</option>
+            <option>Walkthrough booked</option>
+            <option>Proposal sent</option>
+          </select>
+        </label>
+        <span class="lead__saved" aria-live="polite"></span>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="/assets/js/dashboard.js"></script>
+</body>
+</html>
