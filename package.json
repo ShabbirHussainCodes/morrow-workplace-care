@@ -1,0 +1,16 @@
+{
+  "name": "morrow-workplace-care",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Concept website for a fictional workplace care company with a working lead-capture and follow-up workflow. Portfolio project by Shabbir Hussain.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0"
+  }
+}
