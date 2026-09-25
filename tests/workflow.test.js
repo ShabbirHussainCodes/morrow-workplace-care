@@ -55,3 +55,8 @@ test("follow-up draft uses the first name and company", () => {
 test("masks emails for public display", () => {
   assert.equal(maskEmail("jane.doe@acme.com"), "j•••@acme.com");
 });
+
+test("'resetting' meeting rooms is shared-space work, not a one-off reset", () => {
+  const { data } = validateLead({ ...valid, spaceType: "coworking", message: "Our meeting rooms need resetting between bookings." });
+  assert.equal(processLead(data).service, "Shared-space detailing");
+});

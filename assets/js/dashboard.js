@@ -36,6 +36,26 @@ function timeAgo(iso) {
   return `${Math.round(hrs / 24)} d ago`;
 }
 
+// Copy to clipboard, with a fallback for browsers that block the Clipboard API
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch { ok = false; }
+    area.remove();
+    return ok;
+  }
+}
+
 function showNotice(text) {
   notice.textContent = text;
   notice.hidden = !text;
@@ -79,6 +99,15 @@ function renderLead(lead) {
   node.querySelector(".lead__next span").textContent = lead.nextStep;
   node.querySelector(".draft__subject").textContent = `Subject: ${lead.followUp.subject}`;
   node.querySelector(".draft__body").textContent = lead.followUp.body;
+
+  const copyBtn = node.querySelector("[data-copy]");
+  const copied = node.querySelector(".draft__copied");
+  copyBtn.addEventListener("click", async () => {
+    const text = `Subject: ${lead.followUp.subject}\n\n${lead.followUp.body}`;
+    const ok = await copyText(text);
+    copied.textContent = ok ? "Copied — paste it into your email" : "Could not copy. Select the text and copy it manually.";
+    if (ok) setTimeout(() => { copied.textContent = ""; }, 4000);
+  });
 
   const select = node.querySelector("select");
   const saved = node.querySelector(".lead__saved");

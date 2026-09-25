@@ -51,7 +51,7 @@ export function validateLead(input = {}) {
 function inferService(data) {
   if (data.service) return SERVICES[data.service];
   const m = data.message.toLowerCase();
-  if (/(moving|move|refurb|renovat|deep clean|one[- ]off|handover|reset|fit[- ]?out)/.test(m)) return SERVICES.reset;
+  if (/(moving|\bmove\b|refurb|renovat|deep clean|one[- ]off|handover|\breset\b|fit[- ]?out)/.test(m)) return SERVICES.reset;
   if (data.spaceType === "coworking" || /(meeting room|reception|cowork|shared)/.test(m)) return SERVICES.shared;
   return SERVICES.routine;
 }

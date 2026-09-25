@@ -472,3 +472,9 @@ section[id], .result { scroll-margin-top: 88px; }
   .lead__top { flex-direction: column; }
 }
 .result__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+/* Draft actions (dashboard) */
+.btn--small { min-height: 40px; padding: 0.5rem 1rem; font-size: var(--step--1); }
+.draft__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-top: var(--space-2); }
+.draft__copied { font-size: var(--step--1); color: var(--success); }
+.draft__hint { font-size: var(--step--1); color: var(--muted); margin: var(--space-1) 0 0; }
