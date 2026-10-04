@@ -24,13 +24,16 @@ follow-up and notification automation in n8n → proper failure handling.
 
 ## Roles
 
-- **Shabbir** approves plans, builds the n8n workflows himself, and runs every git command.
+- **Shabbir** approves plans, builds the n8n workflows himself, reviews and merges every pull request.
 - **Cowork (planning session)** owns architecture, decisions, docs and review.
 - **Claude Code (you)** writes code and tests, runs local servers and Docker, applies review fixes.
 
 ## Hard rules
 
-1. **Never run `git commit`, `git push`, `git merge`, `git rebase`, `git reset` or any command that changes history or the remote.** Read-only git is fine. When work is ready, print the exact commit message and stop. Shabbir commits.
+1. **Git: work on a branch, never on `main`.**
+   - Cloud session: create one branch per phase (for example `p1-harden-foundation`), commit there in small, clearly named commits, push the branch and open one pull request for the phase. Stop when the PR is open.
+   - Never push to `main`, never merge a PR, never force-push, never rewrite history, never delete a branch. Shabbir merges after review.
+   - Local terminal session: do not commit at all. Print the exact commit message and stop. Shabbir commits.
 2. **Use plan mode.** Show the plan and wait for approval before editing any file.
 3. **Stay inside the current phase** in `docs/PLAN.md`. Do not start the next phase or add unplanned features.
 4. **Architecture changes need an ADR and Shabbir's approval first.** Never silently change a decision in `docs/decisions/`.
@@ -65,4 +68,10 @@ follow-up and notification automation in n8n → proper failure handling.
 
 ## When you finish a task
 
-Report: what changed, the test result, anything you could not verify, and the exact commit message. Then stop.
+Report: what changed, the test result, anything you could not verify, any step Shabbir must do by hand (for example applying a migration or setting an env var), and the PR link or the exact commit message. Then stop.
+
+## What you must not do in any session
+
+- Do not apply migrations to, or run queries against, the production database.
+- Do not create, change or delete anything in HubSpot, n8n, Vercel settings or Resend.
+- Do not build n8n workflows. Shabbir builds them himself.
