@@ -8,7 +8,21 @@ Approved by Shabbir on 4 Oct 2026. Decisions are in `docs/decisions/`. Rules for
 
 ## Current phase
 
-**P1, then P2**, in one cloud session as two separate pull requests (P2 branches from the P1 branch). P0 runs alongside. Update this line when a phase is finished.
+**P1 and P2 are finished and live.** Merged on 4 Oct 2026: PR #1 as `842acd3`, PR #2 as `f86b85c`. Update this section when a phase is finished.
+
+In place:
+- Migrations `0001` to `0003` are applied to the Neon production branch and to a schema-only Neon `dev` branch. The `dev` branch also covers that item of P0.
+- `IP_SALT`, `SESSION_SECRET`, `CRON_SECRET` and `ADMIN_PASSWORD_HASH` are set in Vercel as Secret variables for **Production only**.
+- Checked on the live site by Shabbir on 4 Oct 2026: an enquiry is saved and answered with a reference; admin sign-in; changing a stage; a tagged link produces a lead whose Source line reads `linkedin / social / oct-dem` (the campaign value as typed in the test link); the public monitor; sign-out.
+
+Open from P1 and P2, in plain terms:
+- Run the retention cron once from Vercel and confirm it answers 200. Not confirmed yet: the Cron Jobs page showed no invocations when it was last looked at.
+- Add the Vercel firewall rate-limit rule for `/api/`. Not confirmed yet.
+- Preview deployments have no secrets on purpose, so they answer 500. The Neon integration sets `DATABASE_URL` for "All Environments", so Preview needs its own database setting before it is switched on (see the README, "Deploying").
+- Vercel flags the Neon integration's own variables as "Needs Attention": they are plain variables that any project member can read. Rotating them is a separate task.
+- GitHub Actions prints a Node 20 deprecation warning for `actions/checkout@v4` and `actions/setup-node@v4`. Check for newer major versions.
+
+Next for Claude Code: P4, after Shabbir approves its plan. P0 and P3 are Shabbir's.
 
 ## Target architecture
 

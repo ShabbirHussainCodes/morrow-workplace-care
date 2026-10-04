@@ -83,6 +83,8 @@ npm run migrate -- --apply   # applies pending migrations, one transaction per f
 
 Put the Neon **dev** branch in `.env` first, read the host and database name the dry run prints, and only then use `--apply`. For production, run the same commands with the production connection string set for that one command, before deploying code that needs the change. The current migrations only add things, so the previous version of the code keeps working while they are applied.
 
+On Neon, use the **direct** connection string (switch "Connection pooling" off in the Connect dialog). The first runs used it; the pooled string was not tried. After a run against production, delete `.env` (or put the dev string back) so a later `--apply` cannot reach production by accident.
+
 `0001_baseline.sql` is the original table and does nothing on a database that already has it; it only records itself. `0002` adds public ids, the idempotency key and the rate-limit counters. `0003` adds the attribution columns.
 
 **`0003` must be applied before the code that writes attribution is deployed.** That code inserts into the new columns, so without the migration every enquiry would fail. The code that was deployed before it keeps working after `0003` is applied, because it never writes those columns.
@@ -120,11 +122,16 @@ Test enquiries are hidden from every view after 7 days. A daily job (`/api/cron/
 
 ## Deploying: what to set by hand
 
-1. In Vercel, set all five variables for **Production** and **Preview**. Preview must use the Neon dev branch.
+1. In Vercel, set `IP_SALT`, `SESSION_SECRET`, `CRON_SECRET` and `ADMIN_PASSWORD_HASH` as **Secret** variables for **Production**. `DATABASE_URL` comes from the Neon integration. Preview deployments are left without the secrets on purpose, so they answer 500 ("not configured") instead of writing to a database. Before switching Preview on, give it its own `DATABASE_URL` for the Neon dev branch and its own secret values.
 2. Apply the migrations to the dev branch, then to production, before the new code goes live. For attribution that includes `0003`.
 3. After the first deploy, run the cron once from Vercel and check that it answers 200.
 4. Add a Vercel firewall rate-limit rule for `/api/` as an outer layer. The Hobby plan includes one rate-limit rule per project, and the app also limits requests itself.
 5. Check that the latest `main` is green in GitHub Actions.
+
+Notes from the first deploy:
+- Vercel refuses a second variable with the same name for an environment that already has one ("already exists for the target ..."), and the Environments setting of a saved Secret could not be changed. To change a Secret's environments, delete it and add it again.
+- A new or changed variable only applies to deployments made afterwards (the dashboard says "A new deployment is needed").
+- Put a secret straight into the clipboard so it is never printed, then paste it into Vercel before copying anything else. On macOS: `node -e "process.stdout.write(require('crypto').randomBytes(32).toString('hex'))" | pbcopy`. For the admin hash: `node scripts/hash-password.js | tr -d '\n' | pbcopy`.
 
 ## Privacy
 
