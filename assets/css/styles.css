@@ -73,6 +73,9 @@ h3 { font-size: var(--step-1); line-height: 1.3; }
 
 p { margin: 0 0 var(--space-2); }
 a { color: inherit; text-underline-offset: 3px; }
+
+/* The hidden attribute must win over component display rules such as .btn { display: inline-flex } */
+[hidden] { display: none !important; }
 img { max-width: 100%; height: auto; display: block; }
 
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
@@ -478,3 +481,28 @@ section[id], .result { scroll-margin-top: 88px; }
 .draft__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-top: var(--space-2); }
 .draft__copied { font-size: var(--step--1); color: var(--success); }
 .draft__hint { font-size: var(--step--1); color: var(--muted); margin: var(--space-1) 0 0; }
+
+/* Dashboard: admin sign-in and the public card ----------------------------------------- */
+.dash__actions { display: flex; flex-wrap: wrap; gap: var(--space-1); align-items: center; }
+
+.login {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: var(--space-3); margin-bottom: var(--space-3);
+}
+.login__row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.login__row label { font-weight: 600; color: var(--ink); font-size: var(--step--1); }
+.login__row input {
+  flex: 1 1 14rem; min-height: 44px; padding: 0.6rem 0.8rem;
+  font: 400 1rem/1.3 var(--font-body); color: var(--ink);
+  background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+}
+.login__row input:focus { outline: none; border-color: var(--ink); background: var(--white); }
+.login__hint { font-size: var(--step--1); color: var(--muted); margin: var(--space-2) 0 0; }
+.login__status { font-size: var(--step--1); color: var(--error); margin: var(--space-1) 0 0; }
+.login__status:empty { display: none; }
+
+.lead__stage { font-size: var(--step--1); color: var(--muted); margin: var(--space-1) 0 0; }
+.lead__stage strong { color: var(--ink); }
+
+/* Used only to hold text for the copy-to-clipboard fallback; keeps scripts out of inline styles */
+.copy-fallback { position: fixed; top: 0; left: 0; opacity: 0; pointer-events: none; }
