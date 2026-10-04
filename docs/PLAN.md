@@ -8,7 +8,7 @@ Approved by Shabbir on 4 Oct 2026. Decisions are in `docs/decisions/`. Rules for
 
 ## Current phase
 
-**P0 / P1.** Update this line when a phase is finished.
+**P1, then P2**, in one cloud session as two separate pull requests (P2 branches from the P1 branch). P0 runs alongside. Update this line when a phase is finished.
 
 ## Target architecture
 
