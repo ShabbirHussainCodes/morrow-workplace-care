@@ -177,3 +177,96 @@ export function maskEmail(email) {
   if (!domain) return "•••";
   return `${user.slice(0, 1)}•••@${domain}`;
 }
+
+// ---- Attribution: where a visitor came from ----------------------------------------------------
+// The browser keeps the first touch (UTM tags, referrer, landing page) and sends it with the
+// enquiry. The server runs the same sanitizer again, because nothing from the browser is trusted.
+// A bad value is dropped, never an error: a lead must not be lost over a mistyped campaign tag.
+
+/** What is stored with a lead, in this order. The database columns have the same names. */
+export const ATTRIBUTION_FIELDS = [
+  "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "referrer", "landing_page",
+];
+export const UTM_FIELDS = ATTRIBUTION_FIELDS.slice(0, 5);
+
+/** Longest value kept for each field, in characters. Longer values are cut. */
+export const ATTRIBUTION_LIMITS = {
+  utm_source: 100, utm_medium: 100, utm_campaign: 100, utm_term: 100, utm_content: 100,
+  referrer: 500, landing_page: 300,
+};
+
+/** The browser forgets a stored first touch after this many days. */
+export const ATTRIBUTION_TTL_DAYS = 30;
+
+// Letters and numbers in any script, spaces, and the punctuation real campaign names use.
+// Anything else (< > " ` { } ; $ \ ? [ ]) makes the whole value suspect, so it is dropped.
+const UTM_ALLOWED = /^[\p{L}\p{N}\p{M} _.\-+:\/~%@,()|&=#!*']+$/u;
+// Letters and digits pass the pattern above, so a script scheme needs its own check.
+const SCRIPT_SCHEME = /(^|[^a-z])(javascript|vbscript|data)\s*:/i;
+
+export const emptyAttribution = () => Object.fromEntries(ATTRIBUTION_FIELDS.map((field) => [field, null]));
+
+function cleanUtm(value, max) {
+  const text = cleanText(value, max);
+  if (!text || !UTM_ALLOWED.test(text) || SCRIPT_SCHEME.test(text)) return null;
+  return text;
+}
+
+// Only the origin and path are kept. A query string or fragment can carry personal data
+// (search terms, tokens, email addresses), and credentials in a URL are never wanted.
+function cleanReferrer(value) {
+  const text = cleanText(value, 2000);
+  if (!text) return null;
+  let url;
+  try { url = new URL(text); } catch { return null; }
+  if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+  return cleanText(`${url.protocol}//${url.host}${url.pathname}`, ATTRIBUTION_LIMITS.referrer) || null;
+}
+
+// A path on this site, without its query or fragment.
+function cleanLandingPage(value) {
+  const text = cleanText(value, 2000);
+  if (!text.startsWith("/") || text.startsWith("//") || text.includes("\\")) return null;
+  let url;
+  try { url = new URL(text, "https://placeholder.invalid"); } catch { return null; }
+  if (url.origin !== "https://placeholder.invalid") return null;
+  return cleanText(url.pathname, ATTRIBUTION_LIMITS.landing_page) || null;
+}
+
+/**
+ * Clean attribution from the browser. Always returns all seven fields, each a string or null.
+ * Anything that is not a plain object gives all nulls, and keys we do not know are ignored.
+ */
+export function sanitizeAttribution(input) {
+  const out = emptyAttribution();
+  if (input === null || typeof input !== "object" || Array.isArray(input)) return out;
+  const own = (key) => (Object.hasOwn(input, key) ? input[key] : undefined);   // never inherited keys
+  for (const field of UTM_FIELDS) out[field] = cleanUtm(own(field), ATTRIBUTION_LIMITS[field]);
+  out.referrer = cleanReferrer(own("referrer"));
+  out.landing_page = cleanLandingPage(own("landing_page"));
+  return out;
+}
+
+/** True when at least one UTM tag is present: the visit came from a tagged link. */
+export const isTagged = (attribution) => UTM_FIELDS.some((field) => Boolean(attribution?.[field]));
+
+/** True when any attribution value is present at all. */
+export const hasAttribution = (attribution) => ATTRIBUTION_FIELDS.some((field) => Boolean(attribution?.[field]));
+
+const sameSite = (referrer, ownOrigin) => {
+  try { return Boolean(ownOrigin) && new URL(referrer).origin === ownOrigin; } catch { return false; }
+};
+
+/**
+ * Attribution for one page view. `search` is location.search, `referrer` is document.referrer
+ * and `pathname` is location.pathname. A referrer from our own site is a click between our
+ * pages, not a source, so it is ignored. UTM names are matched in lower case, as tools write them.
+ */
+export function parseTouch({ search = "", referrer = "", pathname = "/", ownOrigin = "" } = {}) {
+  const params = new URLSearchParams(typeof search === "string" ? search : "");
+  const raw = {};
+  for (const field of UTM_FIELDS) raw[field] = params.get(field) ?? undefined;   // first value wins
+  raw.referrer = sameSite(referrer, ownOrigin) ? undefined : referrer;
+  raw.landing_page = pathname;
+  return sanitizeAttribution(raw);
+}
