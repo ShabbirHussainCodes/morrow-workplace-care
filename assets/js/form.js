@@ -1,5 +1,5 @@
 // Enquiry form: validation, submission and the "behind the scenes" result view.
-import { validateLead, processLead } from "./workflow.js";
+import { validateLead, processLead, newSubmissionId } from "./workflow.js";
 
 const form = document.getElementById("lead-form");
 const result = document.getElementById("lead-result");
@@ -7,6 +7,10 @@ const statusEl = document.getElementById("form-status");
 const submitBtn = document.getElementById("submit-btn");
 const FIELDS = ["fullName", "email", "company", "spaceType", "timing", "message"];
 const IS_LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
+
+// One id per form fill. A retry or a double click sends the same id, so the server returns the
+// lead it already saved instead of creating a second one. A new id starts after "send another".
+let submissionId = null;
 
 // Clicking "Ask about …" on a service card pre-tags the enquiry with that service
 document.querySelectorAll("[data-service]").forEach((link) => {
@@ -35,7 +39,7 @@ function renderResult(outcome, { preview = false } = {}) {
 
   document.querySelector("#result-saved span").textContent = preview
     ? "Skipped in local preview. On the live site this is stored in Postgres."
-    : `Stored in the database as lead #${outcome.id}.`;
+    : `Stored in the database. Reference: ${String(outcome.id).slice(0, 8)}.`;
 
   const tags = document.getElementById("result-tags");
   tags.replaceChildren(...outcome.tags.map((t) => {
@@ -70,10 +74,11 @@ form.addEventListener("submit", async (event) => {
   submitBtn.textContent = "Sending…";
 
   try {
+    submissionId ??= newSubmissionId();
     const res = await fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data, website: raw.website }),
+      body: JSON.stringify({ ...data, submissionId, website: raw.website }),
     });
 
     // No backend when previewing with a simple local server: show the workflow without saving
@@ -83,7 +88,13 @@ form.addEventListener("submit", async (event) => {
     }
 
     const body = await res.json().catch(() => ({}));
-    if (res.status === 422 && body.errors) { showErrors(body.errors); return; }
+    if (res.status === 422 && body.errors) {
+      showErrors(body.errors);
+      // An error that belongs to no visible field (for example a bad submission id) still needs a message
+      if (!FIELDS.some((name) => body.errors[name])) statusEl.textContent = body.errors.submissionId || "Please check the form and try again.";
+      return;
+    }
+    if (res.status === 429) { statusEl.textContent = body.error || "Too many enquiries. Please try again in a few minutes."; return; }
     if (!res.ok) throw new Error(body.error || `Request failed (${res.status})`);
     renderResult(body);
   } catch (err) {
@@ -98,6 +109,7 @@ form.addEventListener("submit", async (event) => {
 
 document.getElementById("reset-btn").addEventListener("click", () => {
   form.reset();
+  submissionId = null;
   document.getElementById("service").value = "";
   showErrors({});
   result.hidden = true;
