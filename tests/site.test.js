@@ -68,7 +68,7 @@ test("every page carries the concept strip and the footer disclosure", () => {
     const html = read(file);
     assert.match(html, /class="concept-strip"/, `${rel(file)} has no concept strip`);
     assert.match(html, /Portfolio concept|portfolio concept/, `${rel(file)} concept strip does not say it is a portfolio concept`);
-    assert.match(html, /class="disclosure"/, `${rel(file)} has no footer disclosure`);
+    assert.match(html, /class="[^"]*\bdisclosure\b[^"]*"/, `${rel(file)} has no footer disclosure`);
     assert.match(html, /not a real cleaning company/, `${rel(file)} footer does not say the company is fictional`);
   }
 });

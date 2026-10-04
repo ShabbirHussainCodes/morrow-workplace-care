@@ -1,7 +1,28 @@
 /* ==========================================================================
    Morrow Workplace Care — concept site
-   1. Design tokens  2. Base  3. Layout  4. Components  5. Sections
+   0. Fonts  1. Design tokens  2. Base  3. Layout  4. Components  5. Sections
    ========================================================================== */
+
+/* 0. Fonts ---------------------------------------------------------------
+   Served from this site, so a visit never contacts a font host. Latin subset
+   only; other characters fall back to the system fonts in the tokens below.
+   Sources and licences: assets/fonts/README.md */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/assets/fonts/inter-latin-wght-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/assets/fonts/fraunces-latin-opsz-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* 1. Design tokens ------------------------------------------------------- */
 :root {
@@ -506,3 +527,8 @@ section[id], .result { scroll-margin-top: 88px; }
 
 /* Used only to hold text for the copy-to-clipboard fallback; keeps scripts out of inline styles */
 .copy-fallback { position: fixed; top: 0; left: 0; opacity: 0; pointer-events: none; }
+
+/* Footer details that used to be inline style attributes (a strict CSP does not allow those) */
+.site-footer__tagline { margin-top: 1rem; }
+.site-footer__heading { color: var(--white); }
+.disclosure--flush { margin-top: 0; border-top: 0; padding-top: 0; }
