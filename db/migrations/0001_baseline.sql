@@ -1,5 +1,6 @@
--- Morrow Workplace Care (concept) — lead table
--- Run once in the Neon SQL Editor after creating the database.
+-- Baseline: the leads table exactly as first created by hand from the old db/schema.sql.
+-- Every statement is idempotent, so on a database that already has the table this changes
+-- nothing and only records itself as applied. Never edit this file once it has been applied.
 
 CREATE TABLE IF NOT EXISTS leads (
   id                 BIGSERIAL PRIMARY KEY,
