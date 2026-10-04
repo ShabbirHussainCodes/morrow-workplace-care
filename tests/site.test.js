@@ -56,10 +56,13 @@ test("the retention period is defined only in workflow.js", () => {
   }
 });
 
-test("page copy that names a number of days agrees with RETENTION_DAYS", () => {
+test("copy that says when leads are deleted agrees with RETENTION_DAYS", () => {
+  // Only sentences about deleting, removing or hiding count; other durations are not retention.
   const mentions = [...pages, join(ROOT, "README.md")].flatMap((file) =>
-    [...read(file).matchAll(/(\d+)\s+days/g)].map((m) => ({ file: rel(file), days: Number(m[1]) })));
-  assert.ok(mentions.length >= 2, "expected the copy to mention the retention period");
+    read(file).split(/(?<=[.!?])\s+|\n/)
+      .filter((sentence) => /delet|remov|hidden/i.test(sentence))
+      .flatMap((sentence) => [...sentence.matchAll(/(\d+)\s+days/g)].map((m) => ({ file: rel(file), days: Number(m[1]) }))));
+  assert.ok(mentions.length >= 3, "expected the copy to mention the retention period");
   for (const { file, days } of mentions) assert.equal(days, RETENTION_DAYS, `${file} says ${days} days`);
 });
 
