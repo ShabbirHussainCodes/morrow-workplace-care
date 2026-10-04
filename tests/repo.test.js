@@ -78,6 +78,33 @@ test("a lead that disappears between the two statements is an error, not a silen
   await assert.rejects(() => createRepo(recordingSql([[], []])).insertLead(lead), /gone/);
 });
 
+test("attribution is written to its own columns as bound parameters, in order", async () => {
+  const sql = recordingSql([[row]]);
+  const attribution = {
+    utm_source: "linkedin", utm_medium: "social", utm_campaign: "oct-demo", utm_term: null,
+    utm_content: "hero", referrer: "https://www.linkedin.com/feed/", landing_page: "/",
+  };
+  await createRepo(sql).insertLead({ ...lead, attribution });
+  const { text, values } = sql.calls[0];
+  assert.match(text, /utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, landing_page\s*\)/);
+  assert.deepEqual(values.slice(-7), ["linkedin", "social", "oct-demo", null, "hero", "https://www.linkedin.com/feed/", "/"]);
+  for (const value of ["linkedin", "oct-demo", "feed"]) assert.ok(!text.includes(value));
+});
+
+test("a lead without attribution is stored with NULL in every attribution column", async () => {
+  const sql = recordingSql([[row], [row]]);
+  await createRepo(sql).insertLead(lead);
+  await createRepo(sql).insertLead({ ...lead, attribution: { utm_source: undefined } });
+  for (const call of sql.calls) assert.deepEqual(call.values.slice(-7), [null, null, null, null, null, null, null]);
+});
+
+test("a repeat reads the lead back without writing attribution again", async () => {
+  const sql = recordingSql([[], [row]]);
+  await createRepo(sql).insertLead({ ...lead, attribution: { utm_source: "second" } });
+  assert.doesNotMatch(sql.calls[1].text, /utm_|referrer|landing_page/);
+  assert.deepEqual(sql.calls[1].values, [lead.submissionId]);
+});
+
 test("the insert does not store the IP hash", async () => {
   const sql = recordingSql([[row]]);
   await createRepo(sql).insertLead(lead);

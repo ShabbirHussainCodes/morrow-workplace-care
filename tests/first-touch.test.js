@@ -148,6 +148,6 @@ test("both pages load the capture script and say that campaign details go into l
   for (const page of ["index.html", "demo/index.html"]) {
     const html = readFileSync(new URL(`../${page}`, import.meta.url), "utf8");
     assert.match(html, /<script type="module" src="\/assets\/js\/attribution\.js"><\/script>/, page);
-    assert.match(html, /stores campaign details \(UTM tags, referrer and landing page\) in your browser's localStorage/, page);
+    assert.match(html, /stores campaign details \(UTM tags, referrer and landing page\) in your browser's localStorage and saves them with your enquiry\./, page);
   }
 });

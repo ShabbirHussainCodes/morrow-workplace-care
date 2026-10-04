@@ -21,7 +21,7 @@ export function fakeRepo({ now = () => Date.now() } = {}) {
         name: "Seed Person", email: "seed@example.com", company: "Seed Co", message: "Seeded message text",
         spaceType: "office", timing: "asap", service: "Routine office care", priority: "High",
         tags: ["Office", "Routine office care", "Priority: High"], nextStep: "Reply soon",
-        followUp: { subject: "Seed subject", body: "Seed body" }, status: "New",
+        followUp: { subject: "Seed subject", body: "Seed body" }, status: "New", attribution: {},
         ...overrides,
       };
       state.leads.push(lead);
@@ -37,7 +37,7 @@ export function fakeRepo({ now = () => Date.now() } = {}) {
       return count;
     },
 
-    async insertLead({ submissionId, data, outcome }) {
+    async insertLead({ submissionId, data, outcome, attribution = {} }) {
       state.calls.push("insertLead");
       const existing = state.leads.find((l) => l.submissionId === submissionId);
       if (existing) return { created: false, outcome: outcomeOf(existing) };
@@ -46,6 +46,7 @@ export function fakeRepo({ now = () => Date.now() } = {}) {
         name: data.fullName, email: data.email, company: data.company, message: data.message,
         spaceType: data.spaceType, timing: data.timing, service: outcome.service, priority: outcome.priority,
         tags: outcome.tags, nextStep: outcome.nextStep, followUp: outcome.followUp, status: outcome.status,
+        attribution: { ...attribution },
       };
       state.leads.push(lead);
       return { created: true, outcome: outcomeOf(lead) };
