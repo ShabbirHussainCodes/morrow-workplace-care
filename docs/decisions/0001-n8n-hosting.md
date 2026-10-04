@@ -17,3 +17,12 @@ Learn and build on local Docker (P3–P8). Go live on a small paid VPS with Dock
 
 ## Verify at P9
 Current n8n version, env var names, RAM guidance, and VPS pricing.
+
+## Update (4 Oct 2026): VPS purchase postponed
+The VPS will be chosen and bought later. This does not block P0–P8.
+- All n8n work runs on local Docker. The app runs locally (`vercel dev`) against the Neon dev branch and the local n8n.
+- The n8n intake URL is an optional setting. When it is not set, the live site still stores every lead with a `pending` event and does not try to dispatch.
+- Until n8n is deployed, the live site must say plainly that the automation is not connected yet. It must never show a fake "synced" state.
+- Pending events older than 7 days are removed by the normal retention job.
+- For a recorded walkthrough before P9, a temporary tunnel from the local n8n is acceptable. It is not a hosting solution.
+- P9 only needs configuration (URL, secrets, DNS). No code change should be required to connect the VPS.

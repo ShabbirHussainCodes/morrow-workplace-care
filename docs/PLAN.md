@@ -52,7 +52,7 @@ Column names and types are settled in the P1 and P4 plans.
 
 ## Environment variables
 
-Vercel: `DATABASE_URL`, `IP_SALT`, `SESSION_SECRET`, `ADMIN_PASSWORD_HASH`, `CRON_SECRET`, `N8N_INTAKE_URL`, `APP_TO_N8N_SECRET`, `N8N_TO_APP_SECRET`, `DEMO_MODE`.
+Vercel: `DATABASE_URL`, `IP_SALT`, `SESSION_SECRET`, `ADMIN_PASSWORD_HASH`, `CRON_SECRET`, `N8N_INTAKE_URL` (optional until P9), `APP_TO_N8N_SECRET`, `N8N_TO_APP_SECRET`, `DEMO_MODE`.
 n8n credentials: HubSpot Service Key, Resend API key, the two signing secrets, the sandbox inbox address.
 Final names are fixed in the phase that introduces them and added to `.env.example` with placeholders only.
 
@@ -118,6 +118,7 @@ Every phase ends with: tests green, a short note of what could not be verified, 
 - Done when: every failure drill below passes and is written up in `docs/drills.md` with what was done and what was observed.
 
 ### P9 — Deploy n8n
+- Postponed until a VPS is bought (see ADR 0001 update). P0–P8 run fully on local Docker. P10–P12 can proceed before P9; the live site then shows "automation not connected yet" honestly.
 - Scope: VPS, Docker, Caddy, HTTPS, domain; encryption key and data backups; exported workflows in `n8n/` with no secrets.
 - Done when: a restore from backup works on a clean machine and the live site syncs through the deployed n8n.
 
