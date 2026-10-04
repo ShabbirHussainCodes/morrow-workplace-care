@@ -3,7 +3,7 @@
 //   - Admin mode (after signing in): full details, drafted follow-ups and stage changes.
 // The server decides which view a visitor gets and sends only that data. This script just draws
 // what it receives, and shows every value with textContent, never innerHTML.
-import { processLead, maskEmail, SPACE_TYPES, TIMINGS, STAGES } from "./workflow.js";
+import { processLead, maskEmail, describeAttribution, SPACE_TYPES, TIMINGS, STAGES } from "./workflow.js";
 
 const IS_LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
 const $ = (id) => document.getElementById(id);
@@ -42,8 +42,8 @@ function el(tag, className, text) {
 // Sample data used ONLY for local preview, when no backend is running. Clearly labelled on screen.
 function sampleLeads() {
   const samples = [
-    { fullName: "Sample Person", email: "sample@example.com", company: "Sample Studio (sample)", spaceType: "coworking", timing: "asap", message: "Our meeting rooms need resetting between bookings." },
-    { fullName: "Demo Contact", email: "demo@example.com", company: "Demo Office (sample)", spaceType: "office", timing: "exploring", message: "Looking for a weekly clean for a small office." },
+    { fullName: "Sample Person", email: "sample@example.com", company: "Sample Studio (sample)", spaceType: "coworking", timing: "asap", message: "Our meeting rooms need resetting between bookings.", attribution: { utm_source: "sample-source", utm_medium: "sample-medium", utm_campaign: "sample-campaign", referrer: "https://sample.example/page", landing_page: "/" } },
+    { fullName: "Demo Contact", email: "demo@example.com", company: "Demo Office (sample)", spaceType: "office", timing: "exploring", message: "Looking for a weekly clean for a small office.", attribution: { landing_page: "/" } },
   ];
   return samples.map((s, i) => {
     const o = processLead(s);
@@ -53,6 +53,7 @@ function sampleLeads() {
       spaceType: SPACE_TYPES[s.spaceType], timing: TIMINGS[s.timing], message: s.message,
       service: o.service, priority: o.priority, tags: o.tags, nextStep: o.nextStep,
       followUp: o.followUp, status: i === 0 ? STAGES[0] : STAGES[1],
+      attribution: s.attribution,
     };
   });
 }
@@ -174,6 +175,11 @@ function renderLead(lead) {
   node.querySelector(".lead__tags").replaceChildren(...lead.tags.filter((t) => !t.startsWith("Priority")).map((t) => el("span", "tag", t)));
   node.querySelector(".lead__message").textContent = `“${lead.message}”`;
   node.querySelector(".lead__next span").textContent = lead.nextStep;
+  const source = describeAttribution(lead.attribution);
+  node.querySelector(".lead__source-summary").textContent = source.summary;
+  const sourceDetails = node.querySelector(".lead__source-details");
+  if (source.details.length) sourceDetails.textContent = source.details.join(" · ");
+  else sourceDetails.remove();
   node.querySelector(".draft__subject").textContent = `Subject: ${lead.followUp.subject}`;
   node.querySelector(".draft__body").textContent = lead.followUp.body;
 

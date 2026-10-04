@@ -4,7 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   ATTRIBUTION_FIELDS, ATTRIBUTION_LIMITS, ATTRIBUTION_TTL_DAYS, UTM_FIELDS,
-  emptyAttribution, sanitizeAttribution, parseTouch, isTagged, hasAttribution,
+  emptyAttribution, sanitizeAttribution, parseTouch, isTagged, hasAttribution, describeAttribution,
 } from "../assets/js/workflow.js";
 
 const NULLS = Object.fromEntries(ATTRIBUTION_FIELDS.map((f) => [f, null]));
@@ -197,4 +197,38 @@ test("isTagged and hasAttribution", () => {
   assert.equal(hasAttribution({ ...NULLS, landing_page: "/" }), true);
   assert.equal(hasAttribution(NULLS), false);
   assert.equal(hasAttribution(undefined), false);
+});
+
+// ---- describing attribution for the admin view ---------------------------------------------------
+
+test("a tagged lead is summarised as source / medium / campaign, with the other details below", () => {
+  assert.deepEqual(describeAttribution(GOOD), {
+    summary: "linkedin / social / oct-demo",
+    details: ["Term: office cleaning", "Content: hero_button", "Referrer: https://www.linkedin.com/feed/", "Landing page: /"],
+  });
+});
+
+test("a partly tagged lead shows (not set) for what is missing", () => {
+  assert.equal(describeAttribution({ ...NULLS, utm_source: "newsletter", landing_page: "/" }).summary, "newsletter / (not set) / (not set)");
+  assert.deepEqual(describeAttribution({ ...NULLS, utm_campaign: "spring" }).details, []);
+});
+
+test("a visit with no tags is labelled direct, and still shows its referrer and landing page", () => {
+  assert.deepEqual(describeAttribution({ ...NULLS, referrer: "https://www.google.com/", landing_page: "/demo/" }), {
+    summary: "Direct / no tagged source",
+    details: ["Referrer: https://www.google.com/", "Landing page: /demo/"],
+  });
+  assert.deepEqual(describeAttribution({ ...NULLS, landing_page: "/" }), { summary: "Direct / no tagged source", details: ["Landing page: /"] });
+});
+
+test("a lead with no attribution at all says so, instead of claiming it was direct", () => {
+  for (const input of [NULLS, null, undefined, {}]) {
+    assert.deepEqual(describeAttribution(input), { summary: "No attribution recorded", details: [] });
+  }
+});
+
+test("the description is plain text: markup in a value is returned as it is, never interpreted here", () => {
+  const out = describeAttribution({ ...NULLS, utm_source: "a<b>c" });
+  assert.equal(out.summary, "a<b>c / (not set) / (not set)");
+  assert.equal(typeof out.summary, "string");
 });

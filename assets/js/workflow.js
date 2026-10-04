@@ -270,3 +270,27 @@ export function parseTouch({ search = "", referrer = "", pathname = "/", ownOrig
   raw.landing_page = pathname;
   return sanitizeAttribution(raw);
 }
+
+const NOT_SET = "(not set)";
+
+/**
+ * Plain-text description of a lead's attribution for the admin view.
+ * { summary, details }: a one-line summary and any extra lines. Text only, never HTML.
+ */
+export function describeAttribution(attribution) {
+  if (!hasAttribution(attribution)) return { summary: "No attribution recorded", details: [] };
+
+  const details = [];
+  let summary;
+  if (isTagged(attribution)) {
+    const { utm_source, utm_medium, utm_campaign, utm_term, utm_content } = attribution;
+    summary = [utm_source, utm_medium, utm_campaign].map((value) => value || NOT_SET).join(" / ");
+    if (utm_term) details.push(`Term: ${utm_term}`);
+    if (utm_content) details.push(`Content: ${utm_content}`);
+  } else {
+    summary = "Direct / no tagged source";
+  }
+  if (attribution.referrer) details.push(`Referrer: ${attribution.referrer}`);
+  if (attribution.landing_page) details.push(`Landing page: ${attribution.landing_page}`);
+  return { summary, details };
+}
