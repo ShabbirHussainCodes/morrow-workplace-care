@@ -37,7 +37,7 @@
 ├── vercel.json           # Security headers, CSP and the daily cron
 └── assets/
     ├── css/              # Styles and design tokens
-    ├── js/               # Form, dashboard and the rules shared with the API (workflow.js)
+    ├── js/               # Form, dashboard, first-touch capture (attribution.js) and the rules shared with the API (workflow.js)
     ├── fonts/            # Self-hosted Inter and Fraunces, with licences
     └── images/           # Workspace imagery
 ```
@@ -83,13 +83,36 @@ npm run migrate -- --apply   # applies pending migrations, one transaction per f
 
 Put the Neon **dev** branch in `.env` first, read the host and database name the dry run prints, and only then use `--apply`. For production, run the same commands with the production connection string set for that one command, before deploying code that needs the change. The current migrations only add things, so the previous version of the code keeps working while they are applied.
 
-`0001_baseline.sql` is the original table and does nothing on a database that already has it; it only records itself.
+`0001_baseline.sql` is the original table and does nothing on a database that already has it; it only records itself. `0002` adds public ids, the idempotency key and the rate-limit counters. `0003` adds the attribution columns.
+
+**`0003` must be applied before the code that writes attribution is deployed.** That code inserts into the new columns, so without the migration every enquiry would fail. The code that was deployed before it keeps working after `0003` is applied, because it never writes those columns.
 
 ## Admin mode
 
 The dashboard at `/demo/` opens as a **public monitor**: time, priority, service, space type, timing and stage. It never receives a name, company, email, message or drafted follow-up. The site owner can choose **Admin sign in** and enter the password to see full details, copy drafted follow-ups and change stages.
 
 The session is a signed cookie (`HttpOnly`, `Secure`, `SameSite=Strict`) that lasts 8 hours. It is not stored on the server, so signing out clears the cookie but an already-copied cookie stays valid until it expires; changing `SESSION_SECRET` ends all sessions at once. Changing a stage also requires the request to come from the site itself, and sign-in attempts are rate limited and checked before the password is verified.
+
+## Attribution: where a lead came from
+
+The site records the **first touch** of a visitor: the UTM tags in the link they clicked (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`), the page that referred them, and the page they landed on. It is kept in the browser's `localStorage` and sent with the enquiry, so a visitor who looks around first is still attributed to how they arrived.
+
+Which touch is kept:
+- the first visit is always stored, tagged or not
+- an untagged first visit is replaced by the first **tagged** visit that follows it, so a tagged demo link still counts in a browser that opened the site plainly earlier
+- a tagged touch is never replaced
+- a stored touch is forgotten after 30 days, and storage that is blocked or full never breaks the page
+
+What is stored with the lead, and what is cleaned first (the browser and the server use the same code, `sanitizeAttribution` in `assets/js/workflow.js`):
+- a bad value is **dropped**, never an error: a lead is not lost over a mistyped tag
+- over-long values are cut (100 characters for a UTM value, 500 for the referrer, 300 for the landing path)
+- control characters are removed, and script-like values (angle brackets, quotes, backticks, braces, semicolons, `javascript:`) are dropped
+- the referrer keeps only its origin and path, and the landing page only its path: query strings and fragments can carry personal data and are never stored
+- a referrer from this site itself is not a source
+
+Attribution is shown **only in admin mode**, as a "Source" line on each lead. The public monitor and the public API never carry it.
+
+To try it, open the site with tags, for example `/?utm_source=linkedin&utm_medium=social&utm_campaign=oct-demo`, send a test enquiry, then sign in at `/demo/`. The lead shows `linkedin / social / oct-demo`. Use a private window or clear the site's `localStorage` to start with no stored first touch. No consent banner is built, and whether one is needed for a given audience has not been assessed.
 
 ## Data retention
 
@@ -98,14 +121,14 @@ Test enquiries are hidden from every view after 7 days. A daily job (`/api/cron/
 ## Deploying: what to set by hand
 
 1. In Vercel, set all five variables for **Production** and **Preview**. Preview must use the Neon dev branch.
-2. Apply the migrations to the dev branch, then to production, before the new code goes live.
+2. Apply the migrations to the dev branch, then to production, before the new code goes live. For attribution that includes `0003`.
 3. After the first deploy, run the cron once from Vercel and check that it answers 200.
 4. Add a Vercel firewall rate-limit rule for `/api/` as an outer layer. The Hobby plan includes one rate-limit rule per project, and the app also limits requests itself.
 5. Check that the latest `main` is green in GitHub Actions.
 
 ## Privacy
 
-This is a demonstration. The form asks visitors to use test details, the public dashboard shows no personal details, and test leads are hidden after 7 days and deleted by a daily job. Fonts are served from this site, so a visit contacts no font host.
+This is a demonstration. The form asks visitors to use test details, the public dashboard shows no personal details, and test leads are hidden after 7 days and deleted by a daily job. Fonts are served from this site, so a visit contacts no font host. The first-touch campaign details described above are kept in the visitor's own browser (`localStorage`), and are saved with an enquiry only when one is sent.
 
 ## Author
 
