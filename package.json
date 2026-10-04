@@ -8,7 +8,9 @@
     "node": "24.x"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "migrate": "node --env-file=.env scripts/migrate.js",
+    "hash-password": "node scripts/hash-password.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0"

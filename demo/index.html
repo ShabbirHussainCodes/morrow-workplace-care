@@ -7,16 +7,16 @@
   <meta name="description" content="Demo lead dashboard for the Morrow Workplace Care concept website, built by Shabbir Hussain.">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#12302E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/fraunces-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body class="dash-body">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <div class="concept-strip" role="note">
-    Demo dashboard for a portfolio concept by Shabbir Hussain — test data only, emails masked, deleted after 7 days.
+    Demo dashboard for a portfolio concept by Shabbir Hussain — test data only, no personal details shown publicly, deleted after 7 days.
   </div>
 
   <header class="site-header">
@@ -33,28 +33,32 @@
     <div class="container">
       <div class="dash__head">
         <div>
-          <span class="eyebrow">Team view · demo</span>
+          <span class="eyebrow" id="mode-label">Public monitor · demo</span>
           <h1 class="dash__title">Lead pipeline</h1>
-          <p class="dash__lede">Every enquiry from the website lands here with tags, a priority and a drafted follow-up, so nothing sits unread in an inbox.</p>
+          <p class="dash__lede" id="mode-lede"></p>
         </div>
-        <button class="btn btn--ghost" type="button" id="refresh-btn">Refresh</button>
+        <div class="dash__actions">
+          <button class="btn btn--ghost" type="button" id="refresh-btn">Refresh</button>
+          <button class="btn btn--primary" type="button" id="admin-open-btn" aria-expanded="false" aria-controls="login-form">Admin sign in</button>
+          <button class="btn btn--ghost" type="button" id="admin-signout-btn" hidden>Sign out</button>
+        </div>
       </div>
+
+      <form class="login" id="login-form" hidden novalidate>
+        <div class="login__row">
+          <label for="login-password">Admin password</label>
+          <input id="login-password" type="password" autocomplete="current-password" maxlength="256" required>
+          <button class="btn btn--primary btn--small" type="submit" id="login-submit">Sign in</button>
+        </div>
+        <p class="login__hint">Admin sign-in is for the site owner. Everyone else can use the public monitor below.</p>
+        <p class="login__status" id="login-status" role="alert"></p>
+      </form>
 
       <p class="dash__notice" id="dash-notice" hidden></p>
 
-      <div class="stats" id="stats" aria-live="polite">
-        <div class="stat"><span class="stat__label">New</span><span class="stat__value" data-stat="New">–</span></div>
-        <div class="stat"><span class="stat__label">Walkthrough booked</span><span class="stat__value" data-stat="Walkthrough booked">–</span></div>
-        <div class="stat"><span class="stat__label">Proposal sent</span><span class="stat__value" data-stat="Proposal sent">–</span></div>
-        <div class="stat"><span class="stat__label">High priority</span><span class="stat__value" data-stat="High">–</span></div>
-      </div>
+      <div class="stats" id="stats" aria-live="polite"></div>
 
-      <div class="filters" role="tablist" aria-label="Filter by stage">
-        <button class="filter is-active" role="tab" aria-selected="true" data-filter="all">All</button>
-        <button class="filter" role="tab" aria-selected="false" data-filter="New">New</button>
-        <button class="filter" role="tab" aria-selected="false" data-filter="Walkthrough booked">Walkthrough booked</button>
-        <button class="filter" role="tab" aria-selected="false" data-filter="Proposal sent">Proposal sent</button>
-      </div>
+      <div class="filters" id="filters" role="tablist" aria-label="Filter by stage"></div>
 
       <div id="lead-list" class="lead-list" aria-live="polite">
         <p class="dash__loading">Loading leads…</p>
@@ -64,13 +68,15 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p class="disclosure" style="margin-top:0;border-top:0;padding-top:0">
+      <p class="disclosure disclosure--flush">
         Concept project designed and built by Shabbir Hussain. This is a portfolio demonstration, not a real cleaning company.
         Contact: <a href="https://www.linkedin.com/in/shabbir-h-9b13a7370" target="_blank" rel="noopener">LinkedIn</a> · <a href="mailto:shabbirtech110@gmail.com">shabbirtech110@gmail.com</a>
       </p>
     </div>
   </footer>
 
+  <!-- One card for both views. Elements marked data-admin only exist for a signed-in admin,
+       and elements marked data-public only for visitors; the script removes the others. -->
   <template id="lead-template">
     <article class="lead">
       <div class="lead__top">
@@ -80,10 +86,11 @@
         </div>
         <span class="priority"></span>
       </div>
-      <div class="tags lead__tags"></div>
-      <p class="lead__message"></p>
-      <p class="lead__next"><strong>Next step:</strong> <span></span></p>
-      <details class="lead__draft">
+      <p class="lead__stage" data-public>Stage: <strong class="lead__stage-name"></strong></p>
+      <div class="tags lead__tags" data-admin></div>
+      <p class="lead__message" data-admin></p>
+      <p class="lead__next" data-admin><strong>Next step:</strong> <span></span></p>
+      <details class="lead__draft" data-admin>
         <summary>View drafted follow-up</summary>
         <div class="draft">
           <p class="draft__subject"></p>
@@ -95,13 +102,9 @@
         </div>
         <p class="draft__hint">Paste into your email, replace the [placeholders], send, then move the lead to the next stage.</p>
       </details>
-      <div class="lead__status">
+      <div class="lead__status" data-admin>
         <label>Stage
-          <select>
-            <option>New</option>
-            <option>Walkthrough booked</option>
-            <option>Proposal sent</option>
-          </select>
+          <select></select>
         </label>
         <span class="lead__saved" aria-live="polite"></span>
       </div>
