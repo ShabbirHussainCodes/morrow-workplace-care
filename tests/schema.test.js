@@ -4,7 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { STAGES } from "../assets/js/workflow.js";
+import { ATTRIBUTION_FIELDS, STAGES } from "../assets/js/workflow.js";
 
 const DIR = new URL("../db/migrations/", import.meta.url).pathname;
 const files = readdirSync(DIR).filter((n) => n.endsWith(".sql")).sort();
@@ -55,4 +55,26 @@ test("every statement in every migration is safe to run twice", () => {
       assert.match(statement, /IF NOT EXISTS/i, `${name}: ${statement.slice(0, 70)}`);
     }
   }
+});
+
+// ---- 0003: attribution ---------------------------------------------------------------------
+
+test("0003 adds exactly the attribution fields as nullable text columns", () => {
+  const sql = withoutComments(read("0003_attribution.sql"));
+  const added = [...sql.matchAll(/ADD COLUMN IF NOT EXISTS\s+(\w+)\s+(\w+)\s*([^,;]*)/gi)];
+  assert.deepEqual(added.map((m) => m[1]), ATTRIBUTION_FIELDS);
+  for (const [, name, type, rest] of added) {
+    assert.equal(type.toUpperCase(), "TEXT", `${name} must be TEXT`);
+    assert.equal(rest.trim(), "", `${name} must be nullable with no default or constraint`);
+  }
+});
+
+test("0003 touches only the leads table and does nothing but add those columns", () => {
+  const sql = withoutComments(read("0003_attribution.sql")).trim();
+  assert.match(sql, /^ALTER TABLE leads\s+ADD COLUMN/i);
+  assert.equal((sql.match(/;/g) ?? []).length, 1, "expected a single statement");
+});
+
+test("attribution never gets a constraint that could reject a lead", () => {
+  assert.doesNotMatch(withoutComments(read("0003_attribution.sql")), /\b(NOT NULL|UNIQUE|PRIMARY KEY|REFERENCES|CHECK)\b/i);
 });

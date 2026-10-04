@@ -1,5 +1,6 @@
 // Enquiry form: validation, submission and the "behind the scenes" result view.
 import { validateLead, processLead, newSubmissionId } from "./workflow.js";
+import { getFirstTouch } from "./attribution.js";
 
 const form = document.getElementById("lead-form");
 const result = document.getElementById("lead-result");
@@ -78,7 +79,8 @@ form.addEventListener("submit", async (event) => {
     const res = await fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data, submissionId, website: raw.website }),
+      // attribution is the first touch kept in this browser (or null, which is simply left out)
+      body: JSON.stringify({ ...data, submissionId, attribution: getFirstTouch() ?? undefined, website: raw.website }),
     });
 
     // No backend when previewing with a simple local server: show the workflow without saving

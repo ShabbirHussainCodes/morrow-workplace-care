@@ -532,3 +532,7 @@ section[id], .result { scroll-margin-top: 88px; }
 .site-footer__tagline { margin-top: 1rem; }
 .site-footer__heading { color: var(--white); }
 .disclosure--flush { margin-top: 0; border-top: 0; padding-top: 0; }
+
+/* Dashboard: where the lead came from (admin mode only) */
+.lead__source { font-size: var(--step--1); margin: var(--space-1) 0 0; color: var(--ink-2); }
+.lead__source-details { font-size: var(--step--1); color: var(--muted); margin: 0.15rem 0 var(--space-1); overflow-wrap: anywhere; }

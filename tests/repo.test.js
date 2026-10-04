@@ -78,6 +78,33 @@ test("a lead that disappears between the two statements is an error, not a silen
   await assert.rejects(() => createRepo(recordingSql([[], []])).insertLead(lead), /gone/);
 });
 
+test("attribution is written to its own columns as bound parameters, in order", async () => {
+  const sql = recordingSql([[row]]);
+  const attribution = {
+    utm_source: "linkedin", utm_medium: "social", utm_campaign: "oct-demo", utm_term: null,
+    utm_content: "hero", referrer: "https://www.linkedin.com/feed/", landing_page: "/",
+  };
+  await createRepo(sql).insertLead({ ...lead, attribution });
+  const { text, values } = sql.calls[0];
+  assert.match(text, /utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, landing_page\s*\)/);
+  assert.deepEqual(values.slice(-7), ["linkedin", "social", "oct-demo", null, "hero", "https://www.linkedin.com/feed/", "/"]);
+  for (const value of ["linkedin", "oct-demo", "feed"]) assert.ok(!text.includes(value));
+});
+
+test("a lead without attribution is stored with NULL in every attribution column", async () => {
+  const sql = recordingSql([[row], [row]]);
+  await createRepo(sql).insertLead(lead);
+  await createRepo(sql).insertLead({ ...lead, attribution: { utm_source: undefined } });
+  for (const call of sql.calls) assert.deepEqual(call.values.slice(-7), [null, null, null, null, null, null, null]);
+});
+
+test("a repeat reads the lead back without writing attribution again", async () => {
+  const sql = recordingSql([[], [row]]);
+  await createRepo(sql).insertLead({ ...lead, attribution: { utm_source: "second" } });
+  assert.doesNotMatch(sql.calls[1].text, /utm_|referrer|landing_page/);
+  assert.deepEqual(sql.calls[1].values, [lead.submissionId]);
+});
+
 test("the insert does not store the IP hash", async () => {
   const sql = recordingSql([[row]]);
   await createRepo(sql).insertLead(lead);
@@ -87,7 +114,7 @@ test("the insert does not store the IP hash", async () => {
 test("the public list selects no personal column", async () => {
   const sql = recordingSql([[{ public_id: "id", created_at: "t", priority: "High", service: "S", space_type: "office", timing: "asap", status: "New" }]]);
   const rows = await createRepo(sql).listPublicLeads({ retentionDays: 7, limit: 50 });
-  assert.doesNotMatch(sql.calls[0].text, /full_name|email|company|message|follow_up|next_step|tags|ip_hash/i);
+  assert.doesNotMatch(sql.calls[0].text, /full_name|email|company|message|follow_up|next_step|tags|ip_hash|utm_|referrer|landing_page/i);
   assert.deepEqual(Object.keys(rows[0]).sort(), ["createdAt", "id", "priority", "service", "spaceType", "status", "timing"]);
   assert.deepEqual(sql.calls[0].values, [7, 50]);
 });
@@ -104,6 +131,19 @@ test("the admin list has the full detail, and both lists hide expired leads", as
   for (const call of [sql.calls[0], publicSql.calls[0]]) {
     assert.match(call.text, /created_at > now\(\) - make_interval\(days => \$1\)/);
   }
+});
+
+test("the admin list reads the attribution columns into one object", async () => {
+  const sql = recordingSql([[{
+    public_id: "id", tags: [], utm_source: "linkedin", utm_medium: "social", utm_campaign: "oct-demo", utm_term: null,
+    utm_content: "hero", referrer: "https://www.linkedin.com/feed/", landing_page: "/",
+  }]]);
+  const [lead] = await createRepo(sql).listAdminLeads({ retentionDays: 7, limit: 50 });
+  assert.match(sql.calls[0].text, /utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, landing_page/);
+  assert.deepEqual(lead.attribution, {
+    utm_source: "linkedin", utm_medium: "social", utm_campaign: "oct-demo", utm_term: null,
+    utm_content: "hero", referrer: "https://www.linkedin.com/feed/", landing_page: "/",
+  });
 });
 
 test("a stage change is addressed by public id and says when nothing matched", async () => {

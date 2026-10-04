@@ -70,6 +70,7 @@
     <div class="container">
       <p class="disclosure disclosure--flush">
         Concept project designed and built by Shabbir Hussain. This is a portfolio demonstration, not a real cleaning company.
+        For this demo, the site stores campaign details (UTM tags, referrer and landing page) in your browser's localStorage and saves them with your enquiry.
         Contact: <a href="https://www.linkedin.com/in/shabbir-h-9b13a7370" target="_blank" rel="noopener">LinkedIn</a> · <a href="mailto:shabbirtech110@gmail.com">shabbirtech110@gmail.com</a>
       </p>
     </div>
@@ -90,6 +91,8 @@
       <div class="tags lead__tags" data-admin></div>
       <p class="lead__message" data-admin></p>
       <p class="lead__next" data-admin><strong>Next step:</strong> <span></span></p>
+      <p class="lead__source" data-admin><strong>Source:</strong> <span class="lead__source-summary"></span></p>
+      <p class="lead__source-details" data-admin></p>
       <details class="lead__draft" data-admin>
         <summary>View drafted follow-up</summary>
         <div class="draft">
@@ -111,6 +114,7 @@
     </article>
   </template>
 
+  <script type="module" src="/assets/js/attribution.js"></script>
   <script type="module" src="/assets/js/dashboard.js"></script>
 </body>
 </html>
